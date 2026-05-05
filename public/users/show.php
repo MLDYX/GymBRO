@@ -20,14 +20,18 @@ $publicPlans = $planRepository->publicPlansByUser($userId);
 $sharedEvents = $eventRepository->sharedEvents(current_user_id(), $userId);
 $hasRelation = $friendshipRepository->areFriendsOrPending(current_user_id(), $userId);
 
-$pageTitle = 'Profil uzytkownika';
+$pageTitle = 'Profil użytkownika';
 require_once base_path('app/includes/header.php');
 ?>
 <div class="row g-4">
     <div class="col-lg-4">
         <div class="card p-4">
+            <?php if (!empty($user['avatar_path'])): ?>
+                <img src="<?= e($user['avatar_path']) ?>" alt="Avatar" class="rounded-4 border mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+            <?php endif; ?>
             <h1 class="h3 mb-1"><?= e($user['name']) ?></h1>
             <p class="muted"><?= e($user['training_level'] ?? 'Brak poziomu') ?></p>
+            <p><strong>Staż:</strong> <?= e($user['training_experience'] ?? 'Nie podano') ?></p>
             <p><strong>Cel:</strong> <?= e($user['goal'] ?? 'Nie określono') ?></p>
             <p><strong>Bio:</strong> <?= e($user['bio'] ?? 'Brak opisu.') ?></p>
             <?php if (!$hasRelation && current_user_id() !== $userId): ?>

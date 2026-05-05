@@ -21,12 +21,12 @@ INSERT INTO users (name, email, password_hash, created_at) VALUES
 ('Katarzyna Wisniewska', 'kasia@gymbro.local', '$2a$10$kypbnGGCpJ7UQlysnqzJG.6H.dUewn7UPVWA3Ip.E.8U4jlVnFNnu', '2026-01-08 13:00:00'),
 ('Marek Lewandowski', 'marek@gymbro.local', '$2a$10$kypbnGGCpJ7UQlysnqzJG.6H.dUewn7UPVWA3Ip.E.8U4jlVnFNnu', '2026-01-09 14:00:00');
 
-INSERT INTO user_profiles (user_id, age, height_cm, weight_kg, training_level, goal, bio, updated_at) VALUES
-(1, 24, 182, 84.50, 'sredniozaawansowany', 'masa miesniowa', 'Lubi trening silowy i klasyczne split plany.', '2026-01-10 09:00:00'),
-(2, 22, 168, 61.00, 'poczatkujacy', 'redukcja', 'Dopiero buduje nawyk regularnych treningow.', '2026-01-10 09:05:00'),
-(3, 27, 176, 77.30, 'zaawansowany', 'sila', 'Skupiony na trojboju i wynikach w bojach.', '2026-01-10 09:10:00'),
-(4, 25, 170, 64.20, 'sredniozaawansowany', 'sprawnosc', 'Laczy trening na silowni z bieganiem.', '2026-01-10 09:15:00'),
-(5, 29, 188, 92.10, 'zaawansowany', 'rekompozycja', 'Lubi trening typu push pull legs.', '2026-01-10 09:20:00');
+INSERT INTO user_profiles (user_id, age, height_cm, weight_kg, training_level, training_experience, goal, bio, avatar_path, onboarding_completed, updated_at) VALUES
+(1, 24, 182, 84.50, 'sredniozaawansowany', '1-2 lata', 'masa miesniowa', 'Lubi trening silowy i klasyczne split plany.', NULL, TRUE, '2026-01-10 09:00:00'),
+(2, 22, 168, 61.00, 'poczatkujacy', 'ponizej roku', 'redukcja', 'Dopiero buduje nawyk regularnych treningow.', NULL, TRUE, '2026-01-10 09:05:00'),
+(3, 27, 176, 77.30, 'zaawansowany', '3+ lata', 'sila', 'Skupiony na trojboju i wynikach w bojach.', NULL, TRUE, '2026-01-10 09:10:00'),
+(4, 25, 170, 64.20, 'sredniozaawansowany', '1-2 lata', 'sprawnosc', 'Laczy trening na silowni z bieganiem.', NULL, TRUE, '2026-01-10 09:15:00'),
+(5, 29, 188, 92.10, 'zaawansowany', '3+ lata', 'rekompozycja', 'Lubi trening typu push pull legs.', NULL, TRUE, '2026-01-10 09:20:00');
 
 INSERT INTO friendships (requester_id, receiver_id, status, created_at) VALUES
 (1, 2, 'accepted', '2026-01-12 08:00:00'),

@@ -19,10 +19,10 @@ if (is_post()) {
     $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
 
     $errors = validate_required($_POST, [
-        'name' => 'Imie i nazwisko',
+        'name' => 'Imię i nazwisko',
         'email' => 'E-mail',
-        'password' => 'Haslo',
-        'confirm_password' => 'Potwierdzenie hasla',
+        'password' => 'Hasło',
+        'confirm_password' => 'Potwierdzenie hasła',
     ]);
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -33,12 +33,12 @@ if (is_post()) {
         $errors['email'] = $message;
     }
 
-    if ($message = validate_min_length($password, 6, 'Haslo')) {
+    if ($message = validate_min_length($password, 6, 'Hasło')) {
         $errors['password'] = $message;
     }
 
     if ($password !== $confirmPassword) {
-        $errors['confirm_password'] = 'Hasla musza byc identyczne.';
+        $errors['confirm_password'] = 'Hasła muszą być identyczne.';
     }
 
     if (!$errors) {
@@ -46,7 +46,7 @@ if (is_post()) {
         $profileRepository->createEmpty($userId);
         $activityRepository->create($userId, 'registered', ['email' => $email]);
         login_user($userId, $name);
-        redirect_with_flash('/dashboard.php', 'success', 'Konto zostalo utworzone.');
+        redirect_with_flash('/onboarding.php', 'success', 'Konto zostało utworzone. Dokończ szybki start.');
     }
 }
 
@@ -57,7 +57,7 @@ require_once base_path('app/includes/header.php');
     <div class="col-lg-6">
         <div class="card p-4">
             <h1 class="h3 mb-3">Rejestracja</h1>
-            <p class="muted">Załóż konto i zacznij prowadzić treningi w GymBRO.</p>
+            <p class="muted">Załóż konto i przygotuj swój profil pod wspólne treningi.</p>
             <form method="post">
                 <?= csrf_field() ?>
                 <div class="mb-3">

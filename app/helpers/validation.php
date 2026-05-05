@@ -45,3 +45,86 @@ function validate_numeric_range(mixed $value, string $label, ?float $min = null,
 
     return null;
 }
+
+function validate_uploaded_image(array $file, int $maxBytes = 2_500_000): ?string
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+        return 'Nie udalo sie wgrac zdjecia profilowego.';
+    }
+
+    if (($file['size'] ?? 0) > $maxBytes) {
+        return 'Zdjecie profilowe jest zbyt duze.';
+    }
+
+    $allowed = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+    ];
+
+    $mime = detect_uploaded_image_mime($file);
+    if ($mime === null) {
+        return 'Nie udalo sie rozpoznac typu pliku zdjecia.';
+    }
+
+    if (!in_array($mime, $allowed, true)) {
+        return 'Dozwolone sa tylko pliki JPG, PNG i WEBP.';
+    }
+
+    return null;
+}
+
+function detect_uploaded_image_mime(array $file): ?string
+{
+    $tmpName = $file['tmp_name'] ?? null;
+    if (!$tmpName || !is_file($tmpName)) {
+        return null;
+    }
+
+    if (function_exists('finfo_open')) {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo !== false) {
+            $mime = finfo_file($finfo, $tmpName) ?: null;
+            finfo_close($finfo);
+            if (is_string($mime) && $mime !== '') {
+                return $mime;
+            }
+        }
+    }
+
+    if (function_exists('mime_content_type')) {
+        $mime = mime_content_type($tmpName);
+        if (is_string($mime) && $mime !== '') {
+            return $mime;
+        }
+    }
+
+    if (function_exists('getimagesize')) {
+        $imageInfo = @getimagesize($tmpName);
+        if (is_array($imageInfo) && isset($imageInfo['mime']) && is_string($imageInfo['mime'])) {
+            return $imageInfo['mime'];
+        }
+    }
+
+    $extension = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
+
+    return match ($extension) {
+        'jpg', 'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        default => null,
+    };
+}
+
+function uploaded_image_extension(array $file): string
+{
+    return match (detect_uploaded_image_mime($file)) {
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+        default => 'jpg',
+    };
+}

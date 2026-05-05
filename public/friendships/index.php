@@ -43,9 +43,12 @@ require_once base_path('app/includes/header.php');
                     <?php foreach ($friends as $friend): ?>
                         <div class="friend-card">
                             <div class="d-flex justify-content-between align-items-start gap-3">
-                                <div>
+                                <div class="d-flex align-items-center gap-3">
+                                    <img src="<?= e(avatar_url($friend['avatar_path'] ?? null)) ?>" alt="Avatar" class="rounded-circle border" style="width: 52px; height: 52px; object-fit: cover;">
+                                    <div>
                                     <div class="fw-semibold"><?= e($friend['name']) ?></div>
                                     <div class="meta-line"><?= e($friend['training_level'] ?? 'Ćwiczy regularnie') ?> • <?= e($friend['goal'] ?? 'bez ustawionego celu') ?></div>
+                                    </div>
                                 </div>
                                 <a href="/users/show.php?id=<?= e((string) $friend['user_id']) ?>" class="btn btn-outline-primary btn-sm">Profil</a>
                             </div>
@@ -117,8 +120,13 @@ require_once base_path('app/includes/header.php');
                 <div class="stack-list">
                     <?php foreach (array_slice($discover, 0, 5) as $user): ?>
                         <div class="friend-card">
-                            <div class="fw-semibold"><?= e($user['name']) ?></div>
-                            <div class="meta-line mb-3"><?= e($user['goal'] ?? 'Trenuje ze znajomymi') ?></div>
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <img src="<?= e(avatar_url($user['avatar_path'] ?? null)) ?>" alt="Avatar" class="rounded-circle border" style="width: 52px; height: 52px; object-fit: cover;">
+                                <div>
+                                    <div class="fw-semibold"><?= e($user['name']) ?></div>
+                                    <div class="meta-line"><?= e($user['goal'] ?? 'Trenuje ze znajomymi') ?></div>
+                                </div>
+                            </div>
                             <div class="d-flex gap-2">
                                 <a class="btn btn-outline-primary btn-sm" href="/users/show.php?id=<?= e((string) $user['id']) ?>">Profil</a>
                                 <form method="post" action="/friendships/add.php?id=<?= e((string) $user['id']) ?>">

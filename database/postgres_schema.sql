@@ -18,10 +18,17 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     height_cm INTEGER,
     weight_kg NUMERIC(5,2),
     training_level VARCHAR(50),
+    training_experience VARCHAR(50),
     goal VARCHAR(100),
     bio TEXT,
+    avatar_path VARCHAR(255),
+    onboarding_completed BOOLEAN DEFAULT FALSE,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS training_experience VARCHAR(50);
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS avatar_path VARCHAR(255);
+ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS onboarding_completed BOOLEAN DEFAULT FALSE;
 
 CREATE TABLE IF NOT EXISTS friendships (
     id SERIAL PRIMARY KEY,

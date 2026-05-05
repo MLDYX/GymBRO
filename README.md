@@ -19,6 +19,32 @@ PostgreSQL został użyty do danych relacyjnych, które wymagają spójności, r
 
 MongoDB został użyty do danych dokumentowych i elastycznych, których struktura może być różna dla różnych użytkowników, takich jak dzienniki treningowe, serie ćwiczeń, pomiary progresu, komentarze, powiadomienia i historia aktywności. Dzięki temu jeden wpis treningowy może zawierać dowolną liczbę ćwiczeń i serii bez tworzenia wielu dodatkowych tabel relacyjnych.
 
+## Jak pokazac projekt od strony baz danych
+
+Do obrony projektu przygotowany jest osobny pakiet materialow w katalogu `docs/`.
+
+Najwazniejsze pliki:
+
+- `docs/obrona-bazy-danych.md`
+- `docs/postgresql-erd.md`
+- `docs/mongodb-struktura.md`
+- `docs/queries/postgresql_demo.sql`
+- `docs/queries/mongodb_demo.js`
+
+Jak tego uzyc:
+
+1. Pokaz krotko dzialajaca aplikacje.
+2. Otworz `database/postgres_schema.sql` i `docs/postgresql-erd.md`.
+3. Uruchom kilka zapytan z `docs/queries/postgresql_demo.sql` w `psql` albo `pgAdmin`.
+4. Otworz `database/mongo_seed.js` i `docs/mongodb-struktura.md`.
+5. Uruchom kilka query z `docs/queries/mongodb_demo.js` w `mongosh`.
+
+Skrot uzasadnienia:
+
+- PostgreSQL obsluguje dane relacyjne: uzytkownicy, profile, znajomosci, wydarzenia i plany.
+- MongoDB obsluguje dane elastyczne: logi treningowe, serie, progres, komentarze, powiadomienia i aktywnosci.
+- Najlepszy przyklad sensu MongoDB to `workout_logs`, gdzie jeden dokument przechowuje wiele cwiczen i wiele serii.
+
 ## Najważniejsze funkcje
 
 - rejestracja i logowanie użytkowników
@@ -37,6 +63,7 @@ MongoDB został użyty do danych dokumentowych i elastycznych, których struktur
 
 ```text
 GymBRO/
+├── docs/
 ├── public/
 ├── app/
 ├── database/
@@ -50,6 +77,25 @@ GymBRO/
 - Composer
 - PostgreSQL
 - MongoDB
+
+## Zalecane lokalne uruchomienie
+
+Jesli chcesz stabilnie pracowac nad projektem na Windows, zalecany wariant to:
+
+- projekt poza OneDrive, np. `C:\dev\GymBRO`
+- Apache + PHP z XAMPP
+- PostgreSQL i MongoDB jako osobne uslugi
+
+Docelowy lokalny adres:
+
+```text
+http://localhost/gymbro
+```
+
+Gotowe pliki do tego wariantu:
+
+- `docs/xampp/README.md`
+- `docs/xampp/apache-gymbro.conf`
 
 ## Instalacja krok po kroku
 

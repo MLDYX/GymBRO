@@ -34,7 +34,7 @@ class UserRepository
     public function findById(int $id): ?array
     {
         $statement = $this->pdo->prepare(
-            'SELECT u.*, up.age, up.height_cm, up.weight_kg, up.training_level, up.goal, up.bio
+            'SELECT u.*, up.age, up.height_cm, up.weight_kg, up.training_level, up.training_experience, up.goal, up.bio, up.avatar_path, up.onboarding_completed
              FROM users u
              LEFT JOIN user_profiles up ON up.user_id = u.id
              WHERE u.id = :id
@@ -49,7 +49,7 @@ class UserRepository
     public function allExcept(int $userId): array
     {
         $statement = $this->pdo->prepare(
-            'SELECT u.id, u.name, u.email, up.training_level, up.goal, up.bio
+            'SELECT u.id, u.name, u.email, up.training_level, up.training_experience, up.goal, up.bio, up.avatar_path
              FROM users u
              LEFT JOIN user_profiles up ON up.user_id = u.id
              WHERE u.id <> :user_id

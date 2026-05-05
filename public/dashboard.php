@@ -164,9 +164,12 @@ require_once base_path('app/includes/header.php');
                     <div class="fw-semibold mb-2">Kogo możesz dodać</div>
                     <?php foreach (array_slice($friendSuggestions, 0, 3) as $suggestion): ?>
                         <div class="d-flex justify-content-between align-items-center py-2">
-                            <div>
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="<?= e(avatar_url($suggestion['avatar_path'] ?? null)) ?>" alt="Avatar" class="rounded-circle border" style="width: 44px; height: 44px; object-fit: cover;">
+                                <div>
                                 <div class="fw-semibold"><?= e($suggestion['name']) ?></div>
                                 <div class="muted small"><?= e($suggestion['goal'] ?? 'Ćwiczy regularnie') ?></div>
+                                </div>
                             </div>
                             <form method="post" action="/friendships/add.php?id=<?= e((string) $suggestion['id']) ?>">
                                 <?= csrf_field() ?>
