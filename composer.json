@@ -1,0 +1,9 @@
+{
+  "name": "gymbro/app",
+  "description": "GymBRO - aplikacja webowa w czystym PHP z PostgreSQL i MongoDB",
+  "type": "project",
+  "require": {
+    "php": "^8.0",
+    "mongodb/mongodb": "^2.2"
+  }
+}
