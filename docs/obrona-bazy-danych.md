@@ -4,6 +4,11 @@ Ten plik jest praktyczna sciaga do pokazania projektu na przedmiocie "Bazy danyc
 Zaklada, ze aplikacja juz dziala lokalnie, a dane z `database/postgres_seed.sql` i
 `database/mongo_seed.js` sa wgrane.
 
+Polecane konto do startu pokazu:
+
+- `jan@gymbro.local`
+- haslo: `password123`
+
 ## Co pokazac prowadzacemu
 
 W GymBRO sa dwie bazy danych:
@@ -91,6 +96,7 @@ Cel: pokazac, ze aplikacja faktycznie korzysta z danych z obu baz.
 Otworz:
 
 - `database/postgres_schema.sql`
+- `database/postgres.php`
 - `docs/postgresql-erd.md`
 - `docs/queries/postgresql_demo.sql`
 
@@ -113,6 +119,7 @@ Uruchom 2-3 zapytania z `postgresql_demo.sql`.
 Otworz:
 
 - `database/mongo_seed.js`
+- `database/mongo.php`
 - `docs/mongodb-struktura.md`
 - `docs/queries/mongodb_demo.js`
 
@@ -153,8 +160,11 @@ Jesli padnie pytanie "dlaczego dwie bazy?", odpowiedz:
 
 1. `README.md`
 2. `database/postgres_schema.sql`
-3. `database/mongo_seed.js`
-4. `docs/postgresql-erd.md`
-5. `docs/mongodb-struktura.md`
-6. `docs/queries/postgresql_demo.sql`
-7. `docs/queries/mongodb_demo.js`
+3. `database/postgres.php`
+4. `database/mongo.php`
+5. `database/mongo_seed.js`
+6. `docs/postgresql-erd.md`
+7. `docs/mongodb-struktura.md`
+8. `docs/pokaz-checklista.md`
+9. `docs/queries/postgresql_demo.sql`
+10. `docs/queries/mongodb_demo.js`

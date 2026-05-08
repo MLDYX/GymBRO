@@ -40,7 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        const payload = await response.json();
+        const rawResponse = await response.text();
+        let payload = null;
+
+        try {
+          payload = JSON.parse(rawResponse);
+        } catch (parseError) {
+          throw new Error('Serwer zwrocil niepoprawna odpowiedz. Odswiez strone i sprobuj ponownie.');
+        }
 
         if (!response.ok || !payload.success) {
           throw new Error(payload.message || 'Nie udalo sie wyslac zaproszenia.');

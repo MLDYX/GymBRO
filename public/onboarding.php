@@ -21,7 +21,7 @@ $experienceOptions = ['ponizej roku', '1-2 lata', '3+ lata'];
 $levelOptions = ['poczatkujacy', 'sredniozaawansowany', 'zaawansowany'];
 
 if (($profile['onboarding_completed'] ?? false) && $step === 1) {
-    redirect('/dashboard.php');
+        redirect('/dashboard.php');
 }
 
 if (is_post()) {
@@ -229,7 +229,7 @@ require_once base_path('app/includes/header.php');
                     </div>
                     <div class="d-flex gap-2 mt-4">
                         <button class="btn btn-primary" type="submit">Zapisz i dalej</button>
-                        <a href="/onboarding.php?step=3" class="btn btn-outline-secondary">Pomin ten krok</a>
+                        <a href="<?= e(url('/onboarding.php?step=3')) ?>" class="btn btn-outline-secondary">Pomin ten krok</a>
                     </div>
                 </form>
             <?php else: ?>
@@ -249,7 +249,7 @@ require_once base_path('app/includes/header.php');
                                                 <div class="fw-semibold"><?= e($user['name']) ?></div>
                                                 <div class="meta-line"><?= e($user['goal'] ?? 'Cwiczy regularnie') ?></div>
                                             </div>
-                                            <form method="post" action="/friendships/add.php?id=<?= e((string) $user['id']) ?>" data-onboarding-add-friend>
+                                            <form method="post" action="<?= e(url('/friendships/add.php?id=' . (string) $user['id'])) ?>" data-onboarding-add-friend>
                                                 <?= csrf_field() ?>
                                                 <button class="btn btn-outline-primary btn-sm" type="submit">Dodaj</button>
                                             </form>

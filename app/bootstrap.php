@@ -45,35 +45,32 @@ require_once __DIR__ . '/helpers/validation.php';
 require_once __DIR__ . '/helpers/csrf.php';
 require_once __DIR__ . '/includes/flash.php';
 require_once __DIR__ . '/includes/auth.php';
-
-$GLOBALS['gymbro_pdo'] = require __DIR__ . '/config/postgres.php';
-$GLOBALS['gymbro_mongo'] = require __DIR__ . '/config/mongodb.php';
+require_once dirname(__DIR__) . '/database/postgres.php';
+require_once dirname(__DIR__) . '/database/mongo.php';
 
 function pdo(): PDO
 {
-    return $GLOBALS['gymbro_pdo'];
+    return postgres_connection();
 }
 
 function mongo_client(): ?MongoDB\Client
 {
-    return $GLOBALS['gymbro_mongo']['client'] ?? null;
+    return mongo_client_connection();
 }
 
 function mongo_db(): ?MongoDB\Database
 {
-    $database = $GLOBALS['gymbro_mongo']['database'] ?? null;
-    return $database instanceof MongoDB\Database ? $database : null;
+    return mongo_database_connection();
 }
 
 function mongo_available(): bool
 {
-    return (bool) ($GLOBALS['gymbro_mongo']['available'] ?? false);
+    return mongo_database_available();
 }
 
 function mongo_error_message(): ?string
 {
-    $error = $GLOBALS['gymbro_mongo']['error'] ?? null;
-    return is_string($error) ? $error : null;
+    return mongo_database_error();
 }
 
 function app_name(): string

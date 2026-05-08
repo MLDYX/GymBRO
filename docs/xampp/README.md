@@ -1,50 +1,87 @@
 # GymBRO na XAMPP
 
-To jest zalecany lokalny setup dla GymBRO zamiast `php -S`.
+To jest zalecany lokalny setup dla GymBRO na Windows.
+Nie uzywamy tutaj `php -S`, tylko Apache z XAMPP.
 
-## Zalecana lokalizacja projektu
+## Docelowy uklad
 
-Przenies projekt poza OneDrive, na przyklad:
+- projekt: `C:\dev\GymBRO`
+- Apache i PHP: XAMPP
+- PostgreSQL: osobna instalacja
+- MongoDB: osobna instalacja
+
+Adres aplikacji:
+
+```text
+http://localhost/gymbro
+```
+
+## Krok 1. Przenies projekt poza OneDrive
+
+Najlepiej:
 
 ```text
 C:\dev\GymBRO
 ```
 
-## Co zostaje osobno
+## Krok 2. Dodaj konfiguracje Apache
 
-XAMPP sluzy tutaj tylko do:
+Otworz:
 
-- Apache
-- PHP
+```text
+C:\xampp\apache\conf\httpd.conf
+```
 
-Projekt dalej korzysta z:
+Na koncu pliku dodaj:
 
-- PostgreSQL
-- MongoDB
+```apache
+Include "conf/extra/apache-gymbro.conf"
+```
 
-Nie uzywamy MySQL z XAMPP.
+## Krok 3. Skopiuj plik konfiguracyjny GymBRO
 
-## Konfiguracja Apache
-
-1. Skopiuj projekt do `C:\dev\GymBRO`.
-2. Otworz konfiguracje Apache w XAMPP.
-3. Dodaj zawartosc pliku:
+Skopiuj:
 
 ```text
 docs/xampp/apache-gymbro.conf
 ```
 
-4. Jesli projekt nie lezy w `C:\dev\GymBRO`, popraw sciezke w aliasie i `<Directory>`.
+do:
 
-Plik ustawia:
+```text
+C:\xampp\apache\conf\extra\apache-gymbro.conf
+```
 
-- `Alias /gymbro`
-- `APP_BASE_PATH=/gymbro`
-- zmienne srodowiskowe dla PostgreSQL i MongoDB
+## Krok 4. Popraw dane w `apache-gymbro.conf`
 
-## Konfiguracja PHP w XAMPP
+Sprawdz:
 
-W `php.ini` z XAMPP wlacz:
+- sciezke do projektu
+- uzytkownika PostgreSQL
+- haslo PostgreSQL
+
+Najwazniejsze linie:
+
+```apache
+Alias /gymbro "C:/dev/GymBRO/public"
+SetEnv PGHOST localhost
+SetEnv PGPORT 5432
+SetEnv PGDATABASE gymbro_db
+SetEnv PGUSER postgres
+SetEnv PGPASSWORD CHANGE_ME
+SetEnv MONGODB_URI mongodb://localhost:27017
+SetEnv MONGODB_DB gymbro_mongo
+```
+
+## Krok 5. Wlacz wymagane rozszerzenia PHP
+
+Otworz:
+
+```text
+C:\xampp\php\php.ini
+```
+
+Upewnij sie, ze masz:
 
 ```ini
 extension=openssl
@@ -54,7 +91,7 @@ extension=pdo_pgsql
 extension=mongodb
 ```
 
-Ustaw tez limity uploadu:
+Przydatne ustawienia:
 
 ```ini
 upload_max_filesize = 20M
@@ -62,13 +99,21 @@ post_max_size = 24M
 max_execution_time = 60
 ```
 
-## Jak odpalac projekt
+## Krok 6. Zrestartuj Apache
 
-1. Uruchom Apache w XAMPP Control Panel.
-2. Upewnij sie, ze PostgreSQL dziala.
-3. Upewnij sie, ze MongoDB dziala.
-4. Otworz:
+W XAMPP:
+
+1. `Stop`
+2. `Start`
+
+## Krok 7. Otworz aplikacje
 
 ```text
 http://localhost/gymbro
 ```
+
+## Uwagi
+
+- XAMPP sluzy tutaj tylko do Apache i PHP
+- MySQL z XAMPP nie jest uzywany
+- PostgreSQL i MongoDB dzialaja osobno jako lokalne uslugi

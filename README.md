@@ -1,6 +1,19 @@
 # GymBRO
 
-GymBRO to aplikacja webowa napisana w czystym PHP, przygotowana jako projekt na przedmiot „Bazy danych”. Aplikacja łączy klasyczny model relacyjny w PostgreSQL z dokumentowym modelem MongoDB i pozwala zarządzać planami treningowymi, wydarzeniami, dziennikiem treningów oraz progressem użytkownika.
+GymBRO to aplikacja webowa napisana w czystym PHP na przedmiot "Bazy danych".
+Projekt laczy PostgreSQL i MongoDB w jednej, realnie dzialajacej aplikacji dla
+paczek znajomych chodzacych na silownie.
+
+Uzytkownicy moga:
+
+- zalozyc konto i przejsc onboarding
+- uzupelnic profil i wyniki startowe
+- dodawac znajomych
+- tworzyc plany treningowe
+- umawiac wspolne treningi
+- zapisywac wykonane treningi
+- sledzic progres
+- komentowac plany
 
 ## Technologie
 
@@ -9,340 +22,380 @@ GymBRO to aplikacja webowa napisana w czystym PHP, przygotowana jako projekt na 
 - MongoDB
 - PDO
 - oficjalna biblioteka `mongodb/mongodb`
-- Bootstrap 5 z CDN
-- Chart.js z CDN
-- HTML, CSS, trochę JavaScript
+- Bootstrap 5
+- Chart.js
+- HTML, CSS, JavaScript
+- XAMPP jako lokalny Apache/PHP na Windows
 
-## Dlaczego dwie bazy danych
+## Dlaczego sa dwie bazy danych
 
-PostgreSQL został użyty do danych relacyjnych, które wymagają spójności, relacji i kluczy obcych, takich jak użytkownicy, profile, znajomości, siłownie, ćwiczenia, wydarzenia treningowe oraz plany treningowe.
+### PostgreSQL
 
-MongoDB został użyty do danych dokumentowych i elastycznych, których struktura może być różna dla różnych użytkowników, takich jak dzienniki treningowe, serie ćwiczeń, pomiary progresu, komentarze, powiadomienia i historia aktywności. Dzięki temu jeden wpis treningowy może zawierać dowolną liczbę ćwiczeń i serii bez tworzenia wielu dodatkowych tabel relacyjnych.
+PostgreSQL przechowuje dane relacyjne, ktore wymagaja:
 
-## Jak pokazac projekt od strony baz danych
+- kluczy obcych
+- spojnosci
+- relacji miedzy rekordami
+- wygodnych JOIN-ow
 
-Do obrony projektu przygotowany jest osobny pakiet materialow w katalogu `docs/`.
+W GymBRO sa to:
 
-Najwazniejsze pliki:
+- `users`
+- `user_profiles`
+- `friendships`
+- `gyms`
+- `exercises`
+- `workout_events`
+- `workout_event_participants`
+- `training_plans`
+- `training_plan_days`
+- `training_plan_exercises`
+
+### MongoDB
+
+MongoDB przechowuje dane dokumentowe i elastyczne, gdzie liczba pol
+lub zagniezdzen moze byc rozna dla roznych wpisow.
+
+W GymBRO sa to:
+
+- `workout_logs`
+- `progress_measurements`
+- `plan_comments`
+- `notifications`
+- `activity_logs`
+
+Najlepszy przyklad sensu MongoDB to `workout_logs`, bo jeden dokument moze
+zawierac wiele cwiczen, a kazde cwiczenie wiele serii bez dokladania
+dodatkowych tabel relacyjnych.
+
+## Gdzie sa wszystkie operacje na bazach
+
+Po centralizacji warstwy danych najwazniejsze pliki do pokazania prowadzacemu to:
+
+- `database/postgres.php`
+- `database/mongo.php`
+
+To tam sa wszystkie glowne operacje na PostgreSQL i MongoDB.
+Repozytoria w `app/repositories/` sa juz tylko cienka warstwa wywolujaca
+funkcje z tych dwoch plikow.
+
+## Materialy do obrony
+
+Najwazniejsze pliki do prezentacji:
 
 - `docs/obrona-bazy-danych.md`
 - `docs/postgresql-erd.md`
 - `docs/mongodb-struktura.md`
+- `docs/pokaz-checklista.md`
 - `docs/queries/postgresql_demo.sql`
 - `docs/queries/mongodb_demo.js`
 
-Jak tego uzyc:
+## Rozszerzone dane demo
 
-1. Pokaz krotko dzialajaca aplikacje.
-2. Otworz `database/postgres_schema.sql` i `docs/postgresql-erd.md`.
-3. Uruchom kilka zapytan z `docs/queries/postgresql_demo.sql` w `psql` albo `pgAdmin`.
-4. Otworz `database/mongo_seed.js` i `docs/mongodb-struktura.md`.
-5. Uruchom kilka query z `docs/queries/mongodb_demo.js` w `mongosh`.
+Aktualne seedy tworza wiekszy, realistyczny zestaw danych:
 
-Skrot uzasadnienia:
+- okolo 20 uzytkownikow
+- okolo miesiaca aktywnosci
+- znajomosci, wydarzenia, plany, komentarze, progres i logi treningowe
 
-- PostgreSQL obsluguje dane relacyjne: uzytkownicy, profile, znajomosci, wydarzenia i plany.
-- MongoDB obsluguje dane elastyczne: logi treningowe, serie, progres, komentarze, powiadomienia i aktywnosci.
-- Najlepszy przyklad sensu MongoDB to `workout_logs`, gdzie jeden dokument przechowuje wiele cwiczen i wiele serii.
-
-## Najważniejsze funkcje
-
-- rejestracja i logowanie użytkowników
-- dashboard z danymi z PostgreSQL i MongoDB
-- edycja profilu
-- system znajomych
-- CRUD siłowni
-- CRUD ćwiczeń
-- wydarzenia treningowe z uczestnikami
-- plany treningowe z dniami i ćwiczeniami
-- komentarze planów zapisane w MongoDB
-- dziennik treningowy w MongoDB
-- pomiary progresu i wykresy Chart.js
-
-## Struktura projektu
-
-```text
-GymBRO/
-├── docs/
-├── public/
-├── app/
-├── database/
-├── composer.json
-└── README.md
-```
+Po imporcie aplikacja wyglada jak system, z ktorego grupa znajomych
+korzysta juz od kilku tygodni.
 
 ## Wymagania
 
-- PHP 8.x z rozszerzeniami `pdo_pgsql` i `mongodb`
-- Composer
+Potrzebujesz:
+
+- Windows
+- XAMPP
 - PostgreSQL
-- MongoDB
+- pgAdmin
+- MongoDB Community Server
+- mongosh
+- PHP z rozszerzeniami:
+  - `openssl`
+  - `curl`
+  - `pgsql`
+  - `pdo_pgsql`
+  - `mongodb`
 
-## Zalecane lokalne uruchomienie
+## Zalecana lokalizacja projektu
 
-Jesli chcesz stabilnie pracowac nad projektem na Windows, zalecany wariant to:
+Projekt trzymaj poza OneDrive, najlepiej tutaj:
 
-- projekt poza OneDrive, np. `C:\dev\GymBRO`
-- Apache + PHP z XAMPP
-- PostgreSQL i MongoDB jako osobne uslugi
+```text
+C:\dev\GymBRO
+```
 
-Docelowy lokalny adres:
+## Najwazniejsze pliki konfiguracyjne
+
+- Apache: `docs/xampp/apache-gymbro.conf`
+- Instrukcja XAMPP: `docs/xampp/README.md`
+- PostgreSQL schema: `database/postgres_schema.sql`
+- PostgreSQL seed: `database/postgres_seed.sql`
+- MongoDB seed: `database/mongo_seed.js`
+
+## Co pobrac
+
+### 1. XAMPP
+
+Pobierz i zainstaluj XAMPP:
+
+`https://www.apachefriends.org/`
+
+### 2. PostgreSQL
+
+Pobierz i zainstaluj PostgreSQL:
+
+`https://www.postgresql.org/download/windows/`
+
+### 3. MongoDB Community Server
+
+Pobierz i zainstaluj MongoDB Community Server:
+
+`https://www.mongodb.com/try/download/community`
+
+### 4. MongoDB Shell
+
+Pobierz `mongosh`:
+
+`https://www.mongodb.com/try/download/shell`
+
+## Jak przygotowac XAMPP
+
+### 1. Skopiuj projekt
+
+Przenies projekt do:
+
+```text
+C:\dev\GymBRO
+```
+
+### 2. Skonfiguruj Apache
+
+Otworz:
+
+```text
+C:\xampp\apache\conf\httpd.conf
+```
+
+Na koncu dopisz:
+
+```apache
+Include "conf/extra/apache-gymbro.conf"
+```
+
+Nastepnie skopiuj plik:
+
+```text
+docs/xampp/apache-gymbro.conf
+```
+
+do:
+
+```text
+C:\xampp\apache\conf\extra\apache-gymbro.conf
+```
+
+### 3. Edytuj `apache-gymbro.conf`
+
+Sprawdz lub popraw:
+
+- sciezke do projektu
+- login do PostgreSQL
+- haslo do PostgreSQL
+
+Najwazniejsze linie:
+
+```apache
+Alias /gymbro "C:/dev/GymBRO/public"
+SetEnv PGHOST localhost
+SetEnv PGPORT 5432
+SetEnv PGDATABASE gymbro_db
+SetEnv PGUSER postgres
+SetEnv PGPASSWORD CHANGE_ME
+SetEnv MONGODB_URI mongodb://localhost:27017
+SetEnv MONGODB_DB gymbro_mongo
+```
+
+### 4. Wlacz rozszerzenia PHP w XAMPP
+
+Otworz:
+
+```text
+C:\xampp\php\php.ini
+```
+
+Upewnij sie, ze sa wlaczone:
+
+```ini
+extension=openssl
+extension=curl
+extension=pgsql
+extension=pdo_pgsql
+extension=mongodb
+```
+
+Przydatne limity:
+
+```ini
+upload_max_filesize = 20M
+post_max_size = 24M
+max_execution_time = 60
+```
+
+Po zmianach zrestartuj Apache w XAMPP.
+
+## Jak przygotowac bazy danych
+
+### PostgreSQL - utworzenie bazy
+
+Mozesz to zrobic w `pgAdmin`:
+
+1. Otworz `pgAdmin`
+2. Zaloguj sie do serwera
+3. Kliknij prawym na `Databases`
+4. Wybierz `Create -> Database`
+5. Wpisz:
+
+```text
+gymbro_db
+```
+
+### PostgreSQL - schema i seed
+
+Najprosciej przez `psql`:
+
+```powershell
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d gymbro_db -f C:\dev\GymBRO\database\postgres_schema.sql
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d gymbro_db -f C:\dev\GymBRO\database\postgres_seed.sql
+```
+
+Albo przez `pgAdmin -> Query Tool`:
+
+1. Otworz `database/postgres_schema.sql`
+2. Uruchom plik
+3. Otworz `database/postgres_seed.sql`
+4. Uruchom plik
+
+### MongoDB - seed
+
+Uruchom:
+
+```powershell
+mongosh
+```
+
+W srodku `mongosh` wpisz:
+
+```javascript
+load("C:/dev/GymBRO/database/mongo_seed.js")
+```
+
+Po poprawnym imporcie powinien pojawic sie komunikat:
+
+```text
+GymBRO MongoDB seed inserted into gymbro_mongo
+```
+
+## Jak uruchomic aplikacje
+
+1. Wlacz `Apache` w XAMPP
+2. Upewnij sie, ze dziala PostgreSQL
+3. Upewnij sie, ze dziala MongoDB
+4. Otworz:
 
 ```text
 http://localhost/gymbro
 ```
 
-Gotowe pliki do tego wariantu:
+## Przydatne komendy
 
-- `docs/xampp/README.md`
-- `docs/xampp/apache-gymbro.conf`
-
-## Instalacja krok po kroku
-
-## Najprostsze uruchomienie na Windows
-
-Jeśli chcesz po prostu uruchomić projekt lokalnie bez zabawy w zaawansowaną konfigurację, użyj tej wersji:
-
-### 1. Zainstaluj 4 rzeczy
-
-- PHP 8.x
-- Composer
-- PostgreSQL
-- MongoDB
-
-### 2. W katalogu projektu zainstaluj bibliotekę PHP
-
-Jeśli Composer działa u Ciebie jako plik `composer.phar`, użyj:
+### Start PostgreSQL
 
 ```powershell
-php composer.phar install
+net start postgresql-x64-18
 ```
 
-Jeśli masz normalnie komendę `composer`, użyj:
+### Start MongoDB
 
 ```powershell
-composer install
+net start MongoDB
 ```
 
-### 3. Utwórz bazę PostgreSQL
-
-Najprościej przez **pgAdmin**:
-
-- otwórz `pgAdmin`
-- zaloguj się do lokalnego serwera PostgreSQL
-- kliknij prawym na `Databases`
-- wybierz `Create -> Database`
-- wpisz nazwę: `gymbro_db`
-
-### 4. Wgraj schemat i dane PostgreSQL
-
-Najprościej także przez **pgAdmin**:
-
-- wybierz bazę `gymbro_db`
-- otwórz `Query Tool`
-- wczytaj plik [database/postgres_schema.sql](/c:/Users/wikto/OneDrive/Pulpit/GymBRO/database/postgres_schema.sql)
-- uruchom go
-- potem wczytaj [database/postgres_seed.sql](/c:/Users/wikto/OneDrive/Pulpit/GymBRO/database/postgres_seed.sql)
-- uruchom go
-
-### 5. Wgraj dane do MongoDB
-
-Najprościej przez `mongosh`:
+### Sprawdzenie PostgreSQL
 
 ```powershell
-mongosh
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d gymbro_db -c "SELECT 1;"
 ```
 
-Potem w konsoli:
-
-```javascript
-load("database/mongo_seed.js")
-```
-
-Jeśli `mongosh` nie działa, zainstaluj MongoDB Shell albo użyj MongoDB Compass.
-
-### 6. Uruchom aplikację
-
-W katalogu projektu:
+### Sprawdzenie MongoDB
 
 ```powershell
-php -S localhost:8000 -t public
+mongosh --eval "db.adminCommand({ ping: 1 })"
 ```
 
-Potem otwórz w przeglądarce:
+### Szybkie sprawdzenie liczby danych
+
+```powershell
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -d gymbro_db -c "SELECT COUNT(*) AS users_count FROM users;"
+mongosh --eval "db.getSiblingDB('gymbro_mongo').workout_logs.countDocuments()"
+```
+
+## Konta testowe
+
+Wszystkie konta maja haslo:
 
 ```text
-http://localhost:8000
+password123
 ```
 
-## Minimalny zestaw komend
+Polecane konta do prezentacji:
 
-Jeśli wszystko jest już zainstalowane, wystarczą Ci zwykle tylko te komendy:
+- `jan@gymbro.local`
+- `piotr@gymbro.local`
+- `natalia@gymbro.local`
+- `damian@gymbro.local`
+- `ewa@gymbro.local`
 
-```powershell
-php composer.phar install
-mongosh
-php -S localhost:8000 -t public
-```
-
-Resztę dla PostgreSQL możesz zrobić w `pgAdmin`, bez wpisywania `psql`.
-
-### 1. Sklonuj lub otwórz projekt
-
-Przejdź do katalogu projektu:
-
-```bash
-cd GymBRO
-```
-
-### 2. Zainstaluj Composer
-
-Jeżeli nie masz Composera:
-
-```bash
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-```
-
-Na Windows możesz też pobrać oficjalny instalator z:
-
-`https://getcomposer.org/`
-
-### 3. Zainstaluj zależności PHP
-
-```bash
-composer install
-```
-
-Projekt używa tylko jednej biblioteki zewnętrznej:
-
-```bash
-composer require mongodb/mongodb
-```
-
-### 4. Utwórz bazę PostgreSQL
-
-Zaloguj się do PostgreSQL i utwórz bazę:
-
-```bash
-psql -U postgres -h localhost -p 5432
-```
-
-W konsoli `psql`:
-
-```sql
-CREATE DATABASE gymbro_db;
-```
-
-### 5. Uruchom schemat PostgreSQL
-
-```bash
-psql -U postgres -d gymbro_db -f database/postgres_schema.sql
-```
-
-### 6. Uruchom seedy PostgreSQL
-
-```bash
-psql -U postgres -d gymbro_db -f database/postgres_seed.sql
-```
-
-### 7. Utwórz i zasil MongoDB
-
-Uruchom `mongosh`:
-
-```bash
-mongosh
-```
-
-Następnie:
-
-```javascript
-load("database/mongo_seed.js")
-```
-
-Skrypt utworzy dane w bazie `gymbro_mongo`.
-
-### 8. Skonfiguruj połączenia
-
-Domyślne ustawienia są zapisane w:
-
-- `app/config/postgres.php`
-- `app/config/mongodb.php`
-
-Domyślne wartości:
-
-- PostgreSQL: `host=localhost`, `port=5432`, `dbname=gymbro_db`, `user=postgres`, `password=postgres`
-- MongoDB: `mongodb://localhost:27017`, baza `gymbro_mongo`
-
-Możesz je nadpisać zmiennymi środowiskowymi:
-
-- `PGHOST`
-- `PGPORT`
-- `PGDATABASE`
-- `PGUSER`
-- `PGPASSWORD`
-- `MONGODB_URI`
-- `MONGODB_DB`
-
-### 9. Uruchom aplikację lokalnie
-
-Najprościej przez wbudowany serwer PHP:
-
-```bash
-php -S localhost:8000 -t public
-```
-
-Potem otwórz:
-
-`http://localhost:8000`
-
-## Dane testowe
-
-Przykładowe konto:
-
-- e-mail: `jan@gymbro.local`
-- hasło: `password123`
-
-Pozostałe konta testowe:
+Pozostale konta:
 
 - `anna@gymbro.local`
-- `piotr@gymbro.local`
 - `kasia@gymbro.local`
 - `marek@gymbro.local`
+- `olga@gymbro.local`
+- `tomasz@gymbro.local`
+- `julia@gymbro.local`
+- `kamil@gymbro.local`
+- `zuzanna@gymbro.local`
+- `michal@gymbro.local`
+- `karolina@gymbro.local`
+- `pawel@gymbro.local`
+- `alicja@gymbro.local`
+- `sebastian@gymbro.local`
+- `monika@gymbro.local`
+- `bartosz@gymbro.local`
 
-Wszystkie mają hasło:
+## Co pokazac prowadzacemu
 
-`password123`
+Najkrotsza sensowna kolejnosc:
 
-## Komendy do uruchomienia
+1. Logowanie na konto demo
+2. Dashboard
+3. Znajomi
+4. Wydarzenia
+5. Plany
+6. Log treningowy
+7. Progres
+8. PostgreSQL schema i query
+9. MongoDB seed i query
+10. `database/postgres.php` i `database/mongo.php`
 
-```bash
-composer install
-psql -U postgres -d gymbro_db -f database/postgres_schema.sql
-psql -U postgres -d gymbro_db -f database/postgres_seed.sql
-mongosh
-load("database/mongo_seed.js")
-php -S localhost:8000 -t public
-```
+## Co jeszcze mozna rozbudowac
 
-## Prostsza wersja komend na Twoim Windows
-
-Jeżeli `composer` nie działa jako komenda globalna, użyj:
-
-```powershell
-php composer.phar install
-```
-
-Jeżeli `psql` nie działa jako komenda globalna, wgraj pliki SQL przez `pgAdmin` zamiast przez terminal.
-
-## Co można dalej rozbudować
-
-- reset hasła i weryfikację e-mail
-- paginację list użytkowników, planów i ćwiczeń
-- filtrowanie wydarzeń po mieście i siłowni
-- upload zdjęcia profilowego
-- oznaczanie powiadomień jako przeczytane z poziomu UI
-- edycję i usuwanie wpisów treningowych oraz pomiarów
-- średnie ocen planów i ranking najpopularniejszych planów
-- pełniejsze logowanie aktywności użytkownika
+- edycje i usuwanie workout logow
+- edycje i usuwanie pomiarow progresu
+- oznaczanie powiadomien jako przeczytane z UI
+- upload i kadrowanie avatara
+- paginacje list
+- filtrowanie wydarzen po miescie i silowni
+- eksport planow i logow

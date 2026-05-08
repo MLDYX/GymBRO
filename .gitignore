@@ -1,0 +1,2 @@
+public/uploads/avatars/*
+!public/uploads/avatars/.gitignore
