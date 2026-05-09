@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
   const forms = document.querySelectorAll('[data-onboarding-add-friend]');
   const feedback = document.getElementById('onboarding-friends-feedback');
   const cardsContainer = document.querySelector('[data-onboarding-friends]');
@@ -40,14 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        const rawResponse = await response.text();
-        let payload = null;
-
-        try {
-          payload = JSON.parse(rawResponse);
-        } catch (parseError) {
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
           throw new Error('Serwer zwrocil niepoprawna odpowiedz. Odswiez strone i sprobuj ponownie.');
         }
+
+        const payload = await response.json();
 
         if (!response.ok || !payload.success) {
           throw new Error(payload.message || 'Nie udalo sie wyslac zaproszenia.');
@@ -79,3 +77,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
