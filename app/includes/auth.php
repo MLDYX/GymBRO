@@ -45,6 +45,7 @@ function require_onboarding_if_needed(): void
     $path = request_path();
     $allowed = [
         '/onboarding.php',
+        '/friendships/add.php',
         '/logout.php',
     ];
 
