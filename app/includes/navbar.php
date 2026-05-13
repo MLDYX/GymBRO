@@ -4,13 +4,16 @@ declare(strict_types=1);
 ?>
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold text-primary" href="<?= e(is_logged_in() ? url('/dashboard.php') : url('/index.php')) ?>">GymBRO</a>
+        <a class="navbar-brand fw-bold text-primary" href="<?= e(is_logged_in() ? url(is_admin() ? '/admin/dashboard.php' : '/dashboard.php') : url('/index.php')) ?>">GymBRO</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Przelacz nawigacje">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                 <?php if (is_logged_in()): ?>
+                    <?php if (is_admin()): ?>
+                        <li class="nav-item"><a class="nav-link <?= nav_active(['/admin']) ?>" href="<?= e(url('/admin/dashboard.php')) ?>">Admin Dashboard</a></li>
+                    <?php endif; ?>
                     <li class="nav-item"><a class="nav-link <?= nav_active(['/dashboard.php']) ?>" href="<?= e(url('/dashboard.php')) ?>">Start</a></li>
                     <li class="nav-item"><a class="nav-link <?= nav_active(['/logs', '/progress']) ?>" href="<?= e(url('/logs/index.php')) ?>">Treningi</a></li>
                     <li class="nav-item"><a class="nav-link <?= nav_active(['/events']) ?>" href="<?= e(url('/events/index.php')) ?>">Spotkania</a></li>

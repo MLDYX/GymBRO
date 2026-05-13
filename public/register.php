@@ -45,7 +45,7 @@ if (is_post()) {
         $userId = $userRepository->create($name, $email, password_hash($password, PASSWORD_DEFAULT));
         $profileRepository->createEmpty($userId);
         $activityRepository->create($userId, 'registered', ['email' => $email]);
-        login_user($userId, $name);
+        login_user($userId, $name, $email);
         redirect_with_flash('/onboarding.php', 'success', 'Konto zostało utworzone. Dokończ szybki start.');
     }
 }

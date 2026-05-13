@@ -394,3 +394,73 @@ function mongo_get_latest_activity_logs_for_users(array $userIds, int $limit): a
         ->find(['user_id' => ['$in' => array_values($userIds)]], ['sort' => ['created_at' => -1], 'limit' => $limit])
         ->toArray();
 }
+
+function mongo_admin_count_documents(string $collectionName, array $filter = []): int
+{
+    $collection = mongo_collection($collectionName);
+    if (!$collection) {
+        return 0;
+    }
+
+    return $collection->countDocuments($filter);
+}
+
+function mongo_admin_list_documents(string $collectionName, array $filter = [], array $options = []): array
+{
+    $collection = mongo_collection($collectionName);
+    if (!$collection) {
+        return [];
+    }
+
+    return $collection->find($filter, $options)->toArray();
+}
+
+function mongo_admin_find_document(string $collectionName, string $id): ?object
+{
+    $collection = mongo_collection($collectionName);
+    if (!$collection || !mongo_is_valid_object_id($id)) {
+        return null;
+    }
+
+    return $collection->findOne(['_id' => new ObjectId($id)]);
+}
+
+function mongo_admin_create_document(string $collectionName, array $data): ?string
+{
+    $collection = mongo_collection($collectionName);
+    if (!$collection) {
+        return null;
+    }
+
+    $result = $collection->insertOne($data);
+    $insertedId = $result->getInsertedId();
+
+    return $insertedId ? (string) $insertedId : null;
+}
+
+function mongo_admin_update_document(string $collectionName, string $id, array $data): bool
+{
+    $collection = mongo_collection($collectionName);
+    if (!$collection || !mongo_is_valid_object_id($id)) {
+        return false;
+    }
+
+    $result = $collection->updateOne(
+        ['_id' => new ObjectId($id)],
+        ['$set' => $data]
+    );
+
+    return $result->getMatchedCount() > 0;
+}
+
+function mongo_admin_delete_document(string $collectionName, string $id): bool
+{
+    $collection = mongo_collection($collectionName);
+    if (!$collection || !mongo_is_valid_object_id($id)) {
+        return false;
+    }
+
+    $result = $collection->deleteOne(['_id' => new ObjectId($id)]);
+
+    return $result->getDeletedCount() > 0;
+}

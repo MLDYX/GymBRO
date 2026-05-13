@@ -375,6 +375,37 @@ Pozostale konta:
 - `monika@gymbro.local`
 - `bartosz@gymbro.local`
 
+## Konto admina
+
+Konto admina nie jest dodawane seedem.
+Aplikacja rozpoznaje admina tylko po e-mailu:
+
+```text
+admin@gymbro.local
+```
+
+Haslo:
+
+```text
+admin
+```
+
+Mozesz utworzyc je recznie w PostgreSQL:
+
+```sql
+INSERT INTO users (name, email, password_hash)
+VALUES ('Administrator GymBRO', 'admin@gymbro.local', '$2y$10$SRImlX4dn4XmZTy8PuH9EeN2uzo/uFL22SC92KaZAdGHqlJ6fj3y6');
+
+INSERT INTO user_profiles (user_id, goal, onboarding_completed)
+SELECT id, 'panel administracyjny', TRUE
+FROM users
+WHERE email = 'admin@gymbro.local'
+ON CONFLICT (user_id) DO NOTHING;
+```
+
+Po zalogowaniu tym kontem zobaczysz link `Admin Dashboard`
+oraz osobna sekcje `/admin/*`.
+
 ## Co pokazac prowadzacemu
 
 Najkrotsza sensowna kolejnosc:

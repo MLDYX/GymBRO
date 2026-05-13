@@ -21,3 +21,6 @@ $pageTitle = $pageTitle ?? app_name();
 <main class="py-4">
     <div class="container">
         <?php render_flashes(); ?>
+        <?php if (is_admin() && str_starts_with(request_path(), '/admin')): ?>
+            <?php require __DIR__ . '/admin_nav.php'; ?>
+        <?php endif; ?>

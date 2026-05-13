@@ -2,9 +2,19 @@
 
 declare(strict_types=1);
 
+function admin_email(): string
+{
+    return 'admin@gymbro.local';
+}
+
 function is_logged_in(): bool
 {
     return isset($_SESSION['user_id']);
+}
+
+function is_admin(): bool
+{
+    return is_logged_in() && mb_strtolower((string) ($_SESSION['user_email'] ?? '')) === admin_email();
 }
 
 function require_login(): void
@@ -19,15 +29,27 @@ function require_login(): void
 function require_guest(): void
 {
     if (is_logged_in()) {
-        redirect('/dashboard.php');
+        redirect(is_admin() ? '/admin/dashboard.php' : '/dashboard.php');
     }
 }
 
-function login_user(int $userId, string $userName): void
+function require_admin(): void
+{
+    if (!is_logged_in()) {
+        redirect_with_flash('/login.php', 'warning', 'Zaloguj sie, aby przejsc dalej.');
+    }
+
+    if (!is_admin()) {
+        redirect_with_flash('/dashboard.php', 'warning', 'Nie masz dostepu do panelu administratora.');
+    }
+}
+
+function login_user(int $userId, string $userName, string $userEmail): void
 {
     session_regenerate_id(true);
     $_SESSION['user_id'] = $userId;
     $_SESSION['user_name'] = $userName;
+    $_SESSION['user_email'] = mb_strtolower($userEmail);
 }
 
 function logout_user(): void
@@ -48,6 +70,10 @@ function require_onboarding_if_needed(): void
         '/friendships/add.php',
         '/logout.php',
     ];
+
+    if (is_admin()) {
+        return;
+    }
 
     if (in_array($path, $allowed, true)) {
         return;

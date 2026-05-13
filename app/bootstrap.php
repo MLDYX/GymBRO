@@ -43,6 +43,7 @@ spl_autoload_register(static function (string $class): void {
 require_once __DIR__ . '/helpers/redirect.php';
 require_once __DIR__ . '/helpers/validation.php';
 require_once __DIR__ . '/helpers/csrf.php';
+require_once __DIR__ . '/helpers/admin.php';
 require_once __DIR__ . '/includes/flash.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once dirname(__DIR__) . '/database/postgres.php';
@@ -148,6 +149,11 @@ function current_user_id(): ?int
 function current_user_name(): ?string
 {
     return $_SESSION['user_name'] ?? null;
+}
+
+function current_user_email(): ?string
+{
+    return $_SESSION['user_email'] ?? null;
 }
 
 function base_path(string $path = ''): string

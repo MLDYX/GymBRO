@@ -20,8 +20,11 @@ if (is_post()) {
         if (!$user || !password_verify($password, $user['password_hash'])) {
             $errors['credentials'] = 'Nieprawidlowy e-mail lub haslo.';
         } else {
-            login_user((int) $user['id'], $user['name']);
-            redirect_with_flash('/dashboard.php', 'success', 'Zalogowano pomyslnie.');
+            login_user((int) $user['id'], $user['name'], (string) $user['email']);
+            $redirectPath = mb_strtolower((string) $user['email']) === admin_email()
+                ? '/admin/dashboard.php'
+                : '/dashboard.php';
+            redirect_with_flash($redirectPath, 'success', 'Zalogowano pomyslnie.');
         }
     }
 }

@@ -32,4 +32,19 @@ class GymRepository
     {
         return postgres_find_gym($id);
     }
+
+    public function updateAdmin(int $id, array $data): bool
+    {
+        return postgres_update_gym_admin($id, $data);
+    }
+
+    public function deleteAdmin(int $id): bool
+    {
+        return postgres_delete_gym_admin($id);
+    }
+
+    public function countAll(): int
+    {
+        return postgres_count_gyms();
+    }
 }

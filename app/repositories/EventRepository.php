@@ -57,4 +57,24 @@ class EventRepository
     {
         return postgres_is_event_participant($eventId, $userId);
     }
+
+    public function allAdmin(): array
+    {
+        return postgres_get_all_events_admin();
+    }
+
+    public function updateAdmin(int $id, array $data): bool
+    {
+        return postgres_update_event_admin($id, $data);
+    }
+
+    public function deleteAdmin(int $id): bool
+    {
+        return postgres_delete_event_admin($id);
+    }
+
+    public function countAll(): int
+    {
+        return postgres_count_events();
+    }
 }

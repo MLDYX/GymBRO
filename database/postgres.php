@@ -969,3 +969,389 @@ function postgres_user_owns_training_plan_day(int $dayId, int $userId): bool
 
     return (bool) $statement->fetchColumn();
 }
+
+/**
+ * Zwraca wszystkich uzytkownikow razem z danymi profilu dla panelu admina.
+ */
+function postgres_get_all_users(): array
+{
+    $statement = postgres_connection()->query(
+        'SELECT u.*, up.age, up.height_cm, up.weight_kg, up.training_level, up.training_experience, up.goal, up.bio, up.avatar_path, up.onboarding_completed
+         FROM users u
+         LEFT JOIN user_profiles up ON up.user_id = u.id
+         ORDER BY u.created_at DESC, u.id DESC'
+    );
+
+    return $statement->fetchAll();
+}
+
+function postgres_update_user_account(int $id, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'UPDATE users
+         SET name = :name, email = :email
+         WHERE id = :id'
+    );
+    $statement->execute([
+        'id' => $id,
+        'name' => trim((string) ($data['name'] ?? '')),
+        'email' => mb_strtolower(trim((string) ($data['email'] ?? ''))),
+    ]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_delete_user(int $id): bool
+{
+    $statement = postgres_connection()->prepare('DELETE FROM users WHERE id = :id');
+    $statement->execute(['id' => $id]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_count_users(): int
+{
+    return (int) postgres_connection()->query('SELECT COUNT(*) FROM users')->fetchColumn();
+}
+
+function postgres_count_friendships(): int
+{
+    return (int) postgres_connection()->query('SELECT COUNT(*) FROM friendships')->fetchColumn();
+}
+
+function postgres_count_gyms(): int
+{
+    return (int) postgres_connection()->query('SELECT COUNT(*) FROM gyms')->fetchColumn();
+}
+
+function postgres_count_exercises(): int
+{
+    return (int) postgres_connection()->query('SELECT COUNT(*) FROM exercises')->fetchColumn();
+}
+
+function postgres_count_events(): int
+{
+    return (int) postgres_connection()->query('SELECT COUNT(*) FROM workout_events')->fetchColumn();
+}
+
+function postgres_count_training_plans(): int
+{
+    return (int) postgres_connection()->query('SELECT COUNT(*) FROM training_plans')->fetchColumn();
+}
+
+function postgres_get_latest_users(int $limit): array
+{
+    $statement = postgres_connection()->prepare(
+        'SELECT u.id, u.name, u.email, u.created_at, up.onboarding_completed
+         FROM users u
+         LEFT JOIN user_profiles up ON up.user_id = u.id
+         ORDER BY u.created_at DESC, u.id DESC
+         LIMIT :limit'
+    );
+    $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $statement->execute();
+
+    return $statement->fetchAll();
+}
+
+function postgres_get_pending_friend_requests_global(int $limit): array
+{
+    $statement = postgres_connection()->prepare(
+        "SELECT f.id, f.created_at, requester.name AS requester_name, receiver.name AS receiver_name
+         FROM friendships f
+         JOIN users requester ON requester.id = f.requester_id
+         JOIN users receiver ON receiver.id = f.receiver_id
+         WHERE f.status = 'pending'
+         ORDER BY f.created_at DESC
+         LIMIT :limit"
+    );
+    $statement->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $statement->execute();
+
+    return $statement->fetchAll();
+}
+
+function postgres_get_all_events_admin(): array
+{
+    $statement = postgres_connection()->query(
+        "SELECT we.*, g.name AS gym_name, g.city AS gym_city, u.name AS creator_name,
+                COALESCE(COUNT(wep.id), 0) AS participants_count
+         FROM workout_events we
+         LEFT JOIN gyms g ON g.id = we.gym_id
+         JOIN users u ON u.id = we.creator_id
+         LEFT JOIN workout_event_participants wep ON wep.event_id = we.id
+         GROUP BY we.id, g.name, g.city, u.name
+         ORDER BY we.event_date DESC, we.start_time DESC, we.id DESC"
+    );
+
+    return $statement->fetchAll();
+}
+
+function postgres_update_event_admin(int $id, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        "UPDATE workout_events
+         SET creator_id = :creator_id,
+             gym_id = :gym_id,
+             title = :title,
+             description = :description,
+             event_date = :event_date,
+             start_time = :start_time,
+             max_participants = :max_participants,
+             status = :status
+         WHERE id = :id"
+    );
+    $statement->execute([
+        'id' => $id,
+        'creator_id' => (int) ($data['creator_id'] ?? 0),
+        'gym_id' => ($data['gym_id'] ?? '') !== '' ? (int) $data['gym_id'] : null,
+        'title' => trim((string) ($data['title'] ?? '')),
+        'description' => trim((string) ($data['description'] ?? '')) ?: null,
+        'event_date' => $data['event_date'] ?? null,
+        'start_time' => $data['start_time'] ?? null,
+        'max_participants' => max(2, (int) ($data['max_participants'] ?? 2)),
+        'status' => in_array(($data['status'] ?? 'planned'), ['planned', 'completed', 'cancelled'], true)
+            ? $data['status']
+            : 'planned',
+    ]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_delete_event_admin(int $id): bool
+{
+    $statement = postgres_connection()->prepare('DELETE FROM workout_events WHERE id = :id');
+    $statement->execute(['id' => $id]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_get_all_training_plans_admin(): array
+{
+    $statement = postgres_connection()->query(
+        'SELECT tp.*, u.name AS author_name, COUNT(tpd.id) AS day_count
+         FROM training_plans tp
+         JOIN users u ON u.id = tp.user_id
+         LEFT JOIN training_plan_days tpd ON tpd.plan_id = tp.id
+         GROUP BY tp.id, u.name
+         ORDER BY tp.created_at DESC, tp.id DESC'
+    );
+
+    return $statement->fetchAll();
+}
+
+function postgres_update_training_plan_admin(int $id, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'UPDATE training_plans
+         SET user_id = :user_id,
+             name = :name,
+             description = :description,
+             level = :level,
+             goal = :goal,
+             visibility = :visibility
+         WHERE id = :id'
+    );
+    $statement->execute([
+        'id' => $id,
+        'user_id' => (int) ($data['user_id'] ?? 0),
+        'name' => trim((string) ($data['name'] ?? '')),
+        'description' => trim((string) ($data['description'] ?? '')) ?: null,
+        'level' => trim((string) ($data['level'] ?? '')) ?: null,
+        'goal' => trim((string) ($data['goal'] ?? '')) ?: null,
+        'visibility' => ($data['visibility'] ?? 'private') === 'public' ? 'public' : 'private',
+    ]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_delete_training_plan_admin(int $id): bool
+{
+    $statement = postgres_connection()->prepare('DELETE FROM training_plans WHERE id = :id');
+    $statement->execute(['id' => $id]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_add_training_plan_day_admin(int $planId, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'INSERT INTO training_plan_days (plan_id, name, day_order)
+         VALUES (:plan_id, :name, :day_order)'
+    );
+
+    return $statement->execute([
+        'plan_id' => $planId,
+        'name' => trim((string) ($data['name'] ?? '')),
+        'day_order' => max(1, (int) ($data['day_order'] ?? 1)),
+    ]);
+}
+
+function postgres_find_training_plan_day(int $dayId): ?array
+{
+    $statement = postgres_connection()->prepare(
+        'SELECT tpd.*, tp.user_id, tp.name AS plan_name
+         FROM training_plan_days tpd
+         JOIN training_plans tp ON tp.id = tpd.plan_id
+         WHERE tpd.id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $dayId]);
+    $day = $statement->fetch();
+
+    return $day ?: null;
+}
+
+function postgres_update_training_plan_day_admin(int $dayId, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'UPDATE training_plan_days
+         SET name = :name, day_order = :day_order
+         WHERE id = :id'
+    );
+    $statement->execute([
+        'id' => $dayId,
+        'name' => trim((string) ($data['name'] ?? '')),
+        'day_order' => max(1, (int) ($data['day_order'] ?? 1)),
+    ]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_delete_training_plan_day_admin(int $dayId): bool
+{
+    $statement = postgres_connection()->prepare('DELETE FROM training_plan_days WHERE id = :id');
+    $statement->execute(['id' => $dayId]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_add_exercise_to_training_plan_day_admin(int $dayId, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'INSERT INTO training_plan_exercises
+         (day_id, exercise_id, sets, reps, rest_seconds, notes, exercise_order)
+         VALUES (:day_id, :exercise_id, :sets, :reps, :rest_seconds, :notes, :exercise_order)'
+    );
+
+    return $statement->execute([
+        'day_id' => $dayId,
+        'exercise_id' => (int) ($data['exercise_id'] ?? 0),
+        'sets' => max(1, (int) ($data['sets'] ?? 1)),
+        'reps' => trim((string) ($data['reps'] ?? '')),
+        'rest_seconds' => ($data['rest_seconds'] ?? '') !== '' ? (int) $data['rest_seconds'] : null,
+        'notes' => trim((string) ($data['notes'] ?? '')) ?: null,
+        'exercise_order' => max(1, (int) ($data['exercise_order'] ?? 1)),
+    ]);
+}
+
+function postgres_find_training_plan_exercise(int $exerciseEntryId): ?array
+{
+    $statement = postgres_connection()->prepare(
+        'SELECT tpe.*, tpd.plan_id, e.name AS exercise_name
+         FROM training_plan_exercises tpe
+         JOIN training_plan_days tpd ON tpd.id = tpe.day_id
+         JOIN exercises e ON e.id = tpe.exercise_id
+         WHERE tpe.id = :id
+         LIMIT 1'
+    );
+    $statement->execute(['id' => $exerciseEntryId]);
+    $exercise = $statement->fetch();
+
+    return $exercise ?: null;
+}
+
+function postgres_update_training_plan_exercise_admin(int $exerciseEntryId, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'UPDATE training_plan_exercises
+         SET exercise_id = :exercise_id,
+             sets = :sets,
+             reps = :reps,
+             rest_seconds = :rest_seconds,
+             notes = :notes,
+             exercise_order = :exercise_order
+         WHERE id = :id'
+    );
+    $statement->execute([
+        'id' => $exerciseEntryId,
+        'exercise_id' => (int) ($data['exercise_id'] ?? 0),
+        'sets' => max(1, (int) ($data['sets'] ?? 1)),
+        'reps' => trim((string) ($data['reps'] ?? '')),
+        'rest_seconds' => ($data['rest_seconds'] ?? '') !== '' ? (int) $data['rest_seconds'] : null,
+        'notes' => trim((string) ($data['notes'] ?? '')) ?: null,
+        'exercise_order' => max(1, (int) ($data['exercise_order'] ?? 1)),
+    ]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_delete_training_plan_exercise_admin(int $exerciseEntryId): bool
+{
+    $statement = postgres_connection()->prepare('DELETE FROM training_plan_exercises WHERE id = :id');
+    $statement->execute(['id' => $exerciseEntryId]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_update_gym_admin(int $id, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'UPDATE gyms
+         SET user_id = :user_id,
+             name = :name,
+             city = :city,
+             address = :address,
+             description = :description
+         WHERE id = :id'
+    );
+    $statement->execute([
+        'id' => $id,
+        'user_id' => ($data['user_id'] ?? '') !== '' ? (int) $data['user_id'] : null,
+        'name' => trim((string) ($data['name'] ?? '')),
+        'city' => trim((string) ($data['city'] ?? '')),
+        'address' => trim((string) ($data['address'] ?? '')) ?: null,
+        'description' => trim((string) ($data['description'] ?? '')) ?: null,
+    ]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_delete_gym_admin(int $id): bool
+{
+    $statement = postgres_connection()->prepare('DELETE FROM gyms WHERE id = :id');
+    $statement->execute(['id' => $id]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_update_exercise_admin(int $id, array $data): bool
+{
+    $statement = postgres_connection()->prepare(
+        'UPDATE exercises
+         SET user_id = :user_id,
+             name = :name,
+             muscle_group = :muscle_group,
+             equipment = :equipment,
+             description = :description
+         WHERE id = :id'
+    );
+    $statement->execute([
+        'id' => $id,
+        'user_id' => ($data['user_id'] ?? '') !== '' ? (int) $data['user_id'] : null,
+        'name' => trim((string) ($data['name'] ?? '')),
+        'muscle_group' => trim((string) ($data['muscle_group'] ?? '')),
+        'equipment' => trim((string) ($data['equipment'] ?? '')) ?: null,
+        'description' => trim((string) ($data['description'] ?? '')) ?: null,
+    ]);
+
+    return $statement->rowCount() > 0;
+}
+
+function postgres_delete_exercise_admin(int $id): bool
+{
+    $statement = postgres_connection()->prepare('DELETE FROM exercises WHERE id = :id');
+    $statement->execute(['id' => $id]);
+
+    return $statement->rowCount() > 0;
+}

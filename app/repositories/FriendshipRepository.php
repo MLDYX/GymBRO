@@ -57,4 +57,14 @@ class FriendshipRepository
     {
         return postgres_get_friend_user_ids($userId);
     }
+
+    public function countAll(): int
+    {
+        return postgres_count_friendships();
+    }
+
+    public function pending(int $limit): array
+    {
+        return postgres_get_pending_friend_requests_global($limit);
+    }
 }
