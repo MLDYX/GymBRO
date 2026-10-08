@@ -79,17 +79,6 @@ To tam sa wszystkie glowne operacje na PostgreSQL i MongoDB.
 Repozytoria w `app/repositories/` sa juz tylko cienka warstwa wywolujaca
 funkcje z tych dwoch plikow.
 
-## Materialy do obrony
-
-Najwazniejsze pliki do prezentacji:
-
-- `docs/obrona-bazy-danych.md`
-- `docs/postgresql-erd.md`
-- `docs/mongodb-struktura.md`
-- `docs/pokaz-checklista.md`
-- `docs/queries/postgresql_demo.sql`
-- `docs/queries/mongodb_demo.js`
-
 ## Rozszerzone dane demo
 
 Aktualne seedy tworza wiekszy, realistyczny zestaw danych:
@@ -406,20 +395,6 @@ ON CONFLICT (user_id) DO NOTHING;
 Po zalogowaniu tym kontem zobaczysz link `Admin Dashboard`
 oraz osobna sekcje `/admin/*`.
 
-## Co pokazac prowadzacemu
-
-Najkrotsza sensowna kolejnosc:
-
-1. Logowanie na konto demo
-2. Dashboard
-3. Znajomi
-4. Wydarzenia
-5. Plany
-6. Log treningowy
-7. Progres
-8. PostgreSQL schema i query
-9. MongoDB seed i query
-10. `database/postgres.php` i `database/mongo.php`
 
 ## Co jeszcze mozna rozbudowac
 
